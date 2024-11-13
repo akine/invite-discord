@@ -11,12 +11,13 @@ client.once('ready', async () => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-    console.log(`New member joined: ${member.user.tag}`); // 新しいメンバーが参加したときにログを表示
+    console.log(`New member joined: ${member.user.tag}`);
     if (member.guild.id === GUILD_ID) {
         try {
             const invites = await member.guild.invites.fetch();
-            console.log(`Fetched invites: ${invites.size}`); // 招待情報を取得したときのログを表示
-            const invite = invites.find(inv => inv.code === INVITE_CODE);
+            console.log(`Fetched invites: ${invites.size}`);
+
+            const invite = invites.find(inv => inv.code === INVITE_CODE.split('/').pop()); // URLからコード部分だけを抽出
             if (invite) {
                 const role = member.guild.roles.cache.get(ROLE_ID);
                 if (role) {
@@ -29,11 +30,10 @@ client.on('guildMemberAdd', async (member) => {
                 console.log(`Invite with code ${INVITE_CODE} not found`);
             }
         } catch (error) {
-            console.error(`Error fetching invites: ${error.message}`);
+            console.error(`Error fetching invites or assigning role: ${error.message}`);
         }
     }
 });
-
 client.on('error', console.error);
 
 client.login(TOKEN);
